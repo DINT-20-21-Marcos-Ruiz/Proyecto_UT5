@@ -1,0 +1,205 @@
+﻿<Window x:Class="Proyecto_UT5.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Proyecto_UT5"
+        mc:Ignorable="d"
+        Title="Películas"  MinHeight="480" MaxHeight="480" MinWidth="700" MaxWidth="480" Icon="movie.ico">
+    <Window.Resources>
+        <local:EnumBooleanConversor x:Key="enumBooleanConversor"></local:EnumBooleanConversor>
+        <Style TargetType="TextBox" x:Key="gestionarTextBox_Style">
+            <Setter Property="Width" Value="370"/>
+            <Setter Property="DockPanel.Dock" Value="Right"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+
+        <!--EMISOR TIPO TRIGGER-->
+        <Style TargetType="TextBlock" x:Key="pistaTxtBlock_Trigger">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontStyle" Value="Italic"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=verPista_CheckBox, Path=IsChecked}" Value="False">
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <BlurEffect Radius="10"/>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <!--BACKGORUND GRID DIFICULTAD TRIGGER-->
+        <Style TargetType="Grid" x:Key="backgroundDifGrid_Trigger">
+            <Setter Property="Background" Value="LightGreen"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=Dificultad}" Value="Normal">
+                    <Setter Property="Background" Value="LightGray"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Dificultad}" Value="Dificil">
+                    <Setter Property="Background" Value="IndianRed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--ICONO GÉNERO TRIGGER-->
+        <Style TargetType="Image" x:Key="iconoGenero_Trigger">
+            <Setter Property="Source" Value="/Resources/accion.png"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=Genero}" Value="Comedia">
+                    <Setter Property="Source" Value="/Resources/comedia.png"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Genero}" Value="Drama">
+                    <Setter Property="Source" Value="/Resources/drama.png"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Genero}" Value="CienciaFiccion">
+                    <Setter Property="Source" Value="/Resources/ciencia_ficcion.png"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Genero}" Value="Terror">
+                    <Setter Property="Source" Value="/Resources/terror.jpg"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+
+        <!--MENSAJES ITEM BASE-->
+        <DataTemplate DataType="{x:Type local:Pelicula}">
+            <StackPanel Width="120" Height="140">
+                <Border BorderBrush="DarkGray" BorderThickness="3">
+                    <Image x:Name="peliculaItem_Image" Source="{Binding Imagen}" Stretch="Fill" Width="120" Height="100"/>
+                </Border>
+                <TextBlock x:Name="tituloItem_TextBlock" HorizontalAlignment="Center" Text="{Binding Titulo}"  TextWrapping="Wrap"></TextBlock>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid Background="BlanchedAlmond">
+        <TabControl Margin="5">
+            <TabItem Header="Jugar">
+                <Grid x:Name="jugarPelicula_Grid" Style="{StaticResource backgroundDifGrid_Trigger}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="25"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Margin="30,10,30,10">
+                        <TextBlock DockPanel.Dock="Top" Margin="0,0,0,5">Cartel de la película</TextBlock>
+                        <Border BorderBrush="LightGoldenrodYellow" BorderThickness="12" CornerRadius="2">
+                            <Image x:Name="cartelPel_Image" HorizontalAlignment="Left" Source="{Binding Imagen}" Stretch="Fill">
+                                <Image.Effect>
+                                    <BlurEffect Radius="30"/>
+                                </Image.Effect>
+                            </Image>
+                        </Border>
+                    </DockPanel>
+                    <StackPanel  Grid.Column="1" Margin="0,10,10,10" >
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock HorizontalAlignment="Left" Margin="0,0,0,5">Puntuación total</TextBlock>
+                                <Border HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" CornerRadius="1" Width="110" Height="70">
+                                    <TextBlock x:Name="punTotal_TextBlock" FontSize="50" HorizontalAlignment="Center" Text="0"/>
+                                </Border>
+                            </StackPanel>
+                            <Button x:Name="nuevaPartida_Button" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="35,20,5,0" Width="90" Click="nuevaPartida_Button_Click">Nueva partida</Button>
+                        </StackPanel>
+                        <StackPanel Margin="0,50,0,0">
+                            <TextBlock Margin="0,0,0,5">Título de la película</TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox x:Name="tituloPel_TextBox" Width="250" BorderBrush="Black"></TextBox>
+                                <Button Width="50" x:Name="validar_Button" Margin="10,0,0,0" Click="validar_Button_Click">Validar</Button>
+                            </StackPanel>
+                            <StackPanel Margin="0,25,0,0">
+                                <CheckBox x:Name="verPista_CheckBox" Margin="0,0,0,5">Ver pista</CheckBox>
+                                <TextBlock x:Name="pista_TextBlock" Text="{Binding Pista}" Margin="5,0,0,0" Style="{StaticResource pistaTxtBlock_Trigger}"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,30,0,0">
+                                <Image x:Name="genero_Image" Stretch="Fill" Width="70" Height="70" HorizontalAlignment="Center" Style="{StaticResource iconoGenero_Trigger}"></Image>
+                                <TextBlock HorizontalAlignment="Center">Género</TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+
+                    </StackPanel>
+                    <StackPanel Margin="10,0,10,5" Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" >
+                        <Image Source="Resources/arrow.png" MouseUp="Retroceder_MouseUp" Stretch="Fill" Width="25" ></Image>
+                        <TextBlock x:Name="pagActual_TextBlock">0</TextBlock>
+                        <TextBlock>/</TextBlock>
+                        <TextBlock x:Name="totalPag_TextBlock">0</TextBlock>
+                        <Image Source="Resources/arrow.png" RenderTransformOrigin="0.5,0.5" MouseUp="Avanzar_MouseUp" Width="25" Stretch="Fill">
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="180"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                        </Image>
+                    </StackPanel>
+                </Grid>
+
+            </TabItem>
+
+            <TabItem Header="Gestionar">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel x:Name="newPelicula_StackPanel">
+                        <ListBox x:Name="peliculas_ListBox" Background="LightGoldenrodYellow"
+                          ScrollViewer.VerticalScrollBarVisibility="Visible" 
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          Height="200" Margin="5,5,0,10"
+                          ItemsSource="{Binding}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel></WrapPanel>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+
+                        </ListBox>
+                        <DockPanel HorizontalAlignment="Right" Width="500" Margin="0,0,0,10">
+                            <TextBlock DockPanel.Dock="Left" Margin="0,0,10,0">Título de la película</TextBlock>
+                            <TextBox x:Name="tituloPelGestionar_TextBox" Style="{StaticResource gestionarTextBox_Style}" Text="{Binding Path=Titulo}"></TextBox>
+                        </DockPanel>
+                        <DockPanel HorizontalAlignment="Right" Width="500" Margin="0,0,0,10">
+                            <TextBlock Margin="0,0,10,0" DockPanel.Dock="Left">Pista de la película</TextBlock>
+                            <TextBox x:Name="pistaPelGestionar_TextBox" Style="{StaticResource gestionarTextBox_Style}" Text="{Binding Path=Pista}"></TextBox>
+                        </DockPanel>
+                        <DockPanel HorizontalAlignment="Right" Width="500" Margin="0,0,0,10">
+                            <TextBlock Margin="0,0,10,0">Imágen de la película</TextBlock>
+                            <TextBox x:Name="imagenPelGestionar_TextBox" Style="{StaticResource gestionarTextBox_Style}" Text="{Binding Path=Imagen}"></TextBox>
+                        </DockPanel>
+                        <DockPanel HorizontalAlignment="Right" Width="500" LastChildFill="False">
+                            <TextBlock>Imágen de la película</TextBlock>
+                            <StackPanel Margin="20,0,50,0">
+                                <RadioButton IsChecked="{Binding Path=Dificultad, Converter={StaticResource enumBooleanConversor},ConverterParameter=Facil}" x:Name="facil_RadioButton" >Fácil</RadioButton>
+                                <RadioButton IsChecked="{Binding Path=Dificultad, Converter={StaticResource enumBooleanConversor},ConverterParameter=Normal}" x:Name="normal_RadioButton">Normal</RadioButton>
+                                <RadioButton IsChecked="{Binding Path=Dificultad, Converter={StaticResource enumBooleanConversor},ConverterParameter=Dificil}" x:Name="dificil_RadioButton">Dificil</RadioButton>
+                            </StackPanel>
+                            <TextBlock Margin="0,0,5,0">Género</TextBlock>
+                            <ComboBox Width="80" Height="20" VerticalAlignment="Top" HorizontalContentAlignment="Left">
+                                <ComboBoxItem IsSelected="{Binding Path=Genero, Converter={StaticResource enumBooleanConversor},ConverterParameter=Comedia}">Comedia</ComboBoxItem>
+                                <ComboBoxItem IsSelected="{Binding Path=Genero, Converter={StaticResource enumBooleanConversor},ConverterParameter=Drama}">Drama</ComboBoxItem>
+                                <ComboBoxItem IsSelected="{Binding Path=Genero, Converter={StaticResource enumBooleanConversor},ConverterParameter=Accion}">Acción</ComboBoxItem>
+                                <ComboBoxItem IsSelected="{Binding Path=Genero, Converter={StaticResource enumBooleanConversor},ConverterParameter=Terror}">Terror</ComboBoxItem>
+                                <ComboBoxItem IsSelected="{Binding Path=Genero, Converter={StaticResource enumBooleanConversor},ConverterParameter=CienciaFiccion}">Ciencia-Ficción</ComboBoxItem>
+                            </ComboBox>
+                        </DockPanel>
+                    </StackPanel>
+                    <DockPanel Grid.Column="1" LastChildFill="False" Height="295" VerticalAlignment="Top">
+                        <Button DockPanel.Dock="Top" x:Name="cargarJSON_Button" Margin="10,5,10,5" Click="cargarJSON_Button_Click" >Cargar de JSON</Button>
+                        <Button DockPanel.Dock="Top" x:Name="guardarJSON_Button" Margin="10,5,10,5" Click="guardarJSON_Button_Click">Guardar en JSON</Button>
+                        <Button DockPanel.Dock="Top" x:Name="eliminarPel_Button" Margin="10,30,10,5" Click="eliminarPel_Button_Click">Eliminar película</Button>
+                        <Button DockPanel.Dock="Top" x:Name="añadirPel_Button" Margin="10,5,10,5" Click="añadirPel_Button_Click" >Añadir película</Button>
+                        <Button DockPanel.Dock="Bottom" x:Name="examinar_Button" VerticalAlignment="Bottom" Margin="10,5,10,5" Click="examinar_Button_Click">Examinar</Button>
+                    </DockPanel>
+                   
+
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
